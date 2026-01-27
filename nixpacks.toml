@@ -1,2 +1,5 @@
+[phases.setup]
+nixpkgs = ["maven", "jdk17", "unzip"]
+
 [build]
 cmd = "mvn -DoutputFile=target/mvn-dependency-list.log -B -DskipTests -Pproduction package"
