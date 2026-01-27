@@ -1,2 +1,2 @@
 [build]
-cmd = "mvn -DoutputFile=target/mvn-dependency-list.log -B -DskipTests install"
+cmd = "mvn -DoutputFile=target/mvn-dependency-list.log -B -DskipTests -Pproduction package"
