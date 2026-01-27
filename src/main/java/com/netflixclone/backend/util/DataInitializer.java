@@ -2,8 +2,10 @@ package com.netflixclone.backend.util;
 
 import com.netflixclone.backend.model.Genre;
 import com.netflixclone.backend.model.Movie;
+import com.netflixclone.backend.model.SubscriptionPlan;
 import com.netflixclone.backend.repository.GenreRepository;
 import com.netflixclone.backend.repository.MovieRepository;
+import com.netflixclone.backend.repository.SubscriptionPlanRepository;
 import com.netflixclone.backend.service.YouTubeService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -13,17 +15,25 @@ public class DataInitializer implements CommandLineRunner {
 
     private final MovieRepository movieRepository;
     private final GenreRepository genreRepository;
+    private final SubscriptionPlanRepository planRepository;
     private final YouTubeService youTubeService;
 
-    public DataInitializer(MovieRepository movieRepository, GenreRepository genreRepository, YouTubeService youTubeService) {
+    public DataInitializer(MovieRepository movieRepository, GenreRepository genreRepository, 
+                          SubscriptionPlanRepository planRepository, YouTubeService youTubeService) {
         this.movieRepository = movieRepository;
         this.genreRepository = genreRepository;
+        this.planRepository = planRepository;
         this.youTubeService = youTubeService;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        // Check if data already exists to avoid duplicates
+        // Initialize subscription plans first
+        if (planRepository.findByIsActive(true).isEmpty()) {
+            createSubscriptionPlans();
+        }
+
+        // Check if movie data already exists to avoid duplicates
         if (movieRepository.count() > 0 || genreRepository.count() > 0) {
             return;
         }
@@ -191,5 +201,54 @@ public class DataInitializer implements CommandLineRunner {
         System.out.println("✅ Dummy data loaded successfully!");
         System.out.println("📊 Total Movies: " + movieRepository.count());
         System.out.println("🎭 Total Genres: " + genreRepository.count());
+        System.out.println("💳 Total Plans: " + planRepository.count());
+    }
+
+    private void createSubscriptionPlans() {
+        // Mobile Plan
+        SubscriptionPlan mobile = new SubscriptionPlan();
+        mobile.setName("Mobile");
+        mobile.setPrice(149.0);
+        mobile.setDescription("Perfect for mobile viewing");
+        mobile.setFeatures("SD Quality, 1 Screen, Offline Downloads");
+        mobile.setMaxScreens(1);
+        mobile.setVideoQuality("480p (SD)");
+        mobile.setIsActive(true);
+        planRepository.save(mobile);
+
+        // Basic Plan
+        SubscriptionPlan basic = new SubscriptionPlan();
+        basic.setName("Basic");
+        basic.setPrice(199.0);
+        basic.setDescription("Perfect for individuals");
+        basic.setFeatures("HD Quality, 1 Screen, Offline Downloads");
+        basic.setMaxScreens(1);
+        basic.setVideoQuality("720p (HD)");
+        basic.setIsActive(true);
+        planRepository.save(basic);
+
+        // Standard Plan
+        SubscriptionPlan standard = new SubscriptionPlan();
+        standard.setName("Standard");
+        standard.setPrice(499.0);
+        standard.setDescription("Great for families");
+        standard.setFeatures("Full HD Quality, 2 Screens, Offline Downloads");
+        standard.setMaxScreens(2);
+        standard.setVideoQuality("1080p (Full HD)");
+        standard.setIsActive(true);
+        planRepository.save(standard);
+
+        // Premium Plan
+        SubscriptionPlan premium = new SubscriptionPlan();
+        premium.setName("Premium");
+        premium.setPrice(649.0);
+        premium.setDescription("Best experience with 4K");
+        premium.setFeatures("4K Ultra HD, 4 Screens, Offline Downloads, Spatial Audio");
+        premium.setMaxScreens(4);
+        premium.setVideoQuality("4K (Ultra HD)");
+        premium.setIsActive(true);
+        planRepository.save(premium);
+
+        System.out.println("✅ Subscription plans created successfully!");
     }
 }
